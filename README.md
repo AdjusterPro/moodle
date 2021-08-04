@@ -17,5 +17,9 @@ git push
 
 4. On Moodle server
 ```
-git pull
+$ cd /var/www/domains/moodle
+$ sudo -u apache /usr/bin/php admin/cli/maintenance.php --enable
+$ git pull
+$ sudo -u apache /usr/bin/php admin/cli/upgrade.php --non-interactive
+$ sudo -u apache /usr/bin/php admin/cli/maintenance.php --disable
 ```
