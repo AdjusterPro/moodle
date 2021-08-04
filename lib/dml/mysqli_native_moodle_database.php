@@ -561,7 +561,26 @@ class mysqli_native_moodle_database extends moodle_database {
         if ($dbhost and !empty($this->dboptions['dbpersist'])) {
             $dbhost = "p:$dbhost";
         }
+
         $this->mysqli = mysqli_init();
+	
+	$ssl = false;
+	$dbcertificate = NULL;
+	$mysqli_flags = 0;
+
+	if (!empty($this->dboptions['dbssl'])) {
+	    $ssl = (bool)$this->dboptions['dbssl'];
+	}
+	if (!empty($this->dboptions['dbcertificate'])) {
+	    $dbcertificate = (string)$this->dboptions['dbcertificate'];
+	    $mysqli_flags = MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT;
+	}
+
+	if ($ssl) // turn on SSL (and provide server CA if configured)
+	{
+            $this->mysqli->ssl_set(NULL,NULL, $dbcertificate, NULL, NULL) ;
+	}
+
         if (!empty($this->dboptions['connecttimeout'])) {
             $this->mysqli->options(MYSQLI_OPT_CONNECT_TIMEOUT, $this->dboptions['connecttimeout']);
         }
@@ -570,7 +589,7 @@ class mysqli_native_moodle_database extends moodle_database {
         $dberr = null;
         try {
             // real_connect() is doing things we don't expext.
-            $conn = @$this->mysqli->real_connect($dbhost, $dbuser, $dbpass, $dbname, $dbport, $dbsocket);
+            $conn = @$this->mysqli->real_connect($dbhost, $dbuser, $dbpass, $dbname, $dbport, $dbsocket, $mysqli_flags);
         } catch (\Exception $e) {
             $dberr = "$e";
         }
