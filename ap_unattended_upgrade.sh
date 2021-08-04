@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Set the working directory
+cd "$(dirname "$0")"
+
 # Fetch updates
 git remote update
 
