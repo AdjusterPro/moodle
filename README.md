@@ -10,8 +10,9 @@
     git merge MOODLE_311_STABLE
     `````
 
-3. Push to origin
+3. Commit and Push to origin
     ```
+    git commit -m "Update to Moodle 3.11.x"
     git push
     ```
 
