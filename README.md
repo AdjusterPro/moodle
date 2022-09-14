@@ -1,3 +1,18 @@
+**Setup:**
+
+Clone this repo
+```
+git clone git@github.com:AdjusterPro/moodle.git
+```
+
+Add the official Moodle repo as an upstream source
+```
+git remote add upstream git://git.moodle.org/moodle.git
+```
+
+
+When an update is released, follow these steps to merge the upstream changes into our localized version.
+
 1. Fetch upstream changes
     ```
     git checkout MOODLE_311_STABLE
