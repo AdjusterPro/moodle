@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2020 Respondus, Inc.  All Rights Reserved.
-// Date: December 07, 2020.
+// Copyright (c) 2011-2021 Respondus, Inc.  All Rights Reserved.
+// Date: October 27, 2021.
 
 define("LOCKDOWNBROWSER_LOCKLIB_ENABLE_LOG", false); // set true to enable logging to temp file
 define("LOCKDOWNBROWSER_LOCKLIB_LOG", "ldb_locklib.log");
@@ -203,6 +203,23 @@ function lockdownbrowser_browser_sdk2015_detected() {
     return true;
 }
 
+// Trac #6588
+function lockdownbrowser_browser_chromeos_detected() {
+    if (isset($_SERVER['HTTP_USER_AGENT'])) {
+        $user_agent = $_SERVER['HTTP_USER_AGENT'];
+        if (strpos($user_agent, " CrOS ") !== false) {
+            return true;
+        }
+    }
+    if (isset($_SERVER['HTTP_SEC_CH_UA_PLATFORM'])) {
+        $sec_ch_ua_platform = $_SERVER['HTTP_SEC_CH_UA_PLATFORM'];
+        if (strpos($sec_ch_ua_platform, "Chrome OS") !== false) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function lockdownbrowser_format_access_error($message) {
     $formatted = "<div style='font-size: 150%; color:red; text-align: center; padding: 30px'>$message</div>";
     return $formatted;
@@ -227,14 +244,6 @@ function lockdownbrowser_check_for_lock($quizobj, $prevent_launch) {
         $discriminator = $id;
     } else if ($cmid) {
         $discriminator = $cmid;
-    }
-
-    if (isset($_SESSION['LOCKDOWNBROWSER_CONTEXT'])) {
-        if ($script . "NONE" . $discriminator == $_SESSION['LOCKDOWNBROWSER_CONTEXT']
-          || $script . "VALID" . $discriminator == $_SESSION['LOCKDOWNBROWSER_CONTEXT']
-          ) {
-            return false;
-        }
     }
 
     if ($id) {
@@ -293,8 +302,14 @@ function lockdownbrowser_check_for_lock($quizobj, $prevent_launch) {
 
     if (!$ldbopt) {
 
-        $_SESSION['LOCKDOWNBROWSER_CONTEXT'] = $script . "NONE" . $discriminator;
-        return false;
+        // assume the LMS quiz browser security setting specifies our quiz rule,
+        // since that is the only way to reach this point, but the LDB Dashboard
+        // indicates the quiz does not require LDB, since our block has no settings
+        // stored for it, so the quiz was probably copied or moved from another course
+        $errmsg = get_string('errquizcopymove', 'block_lockdownbrowser');
+        $myerror = lockdownbrowser_format_access_error($errmsg);
+        $_SESSION['LOCKDOWNBROWSER_CONTEXT'] = $script . "INVALID" . $discriminator;
+        return $myerror;
 
     } else {
 
@@ -525,6 +540,9 @@ function lockdownbrowser_prevent_access_fragment_for_quiz($quiz, $fragment_type,
             if (lockdownbrowser_browser_cbldbex_detected()) {
                 // Trac #6026
                 // omit download links
+            } else if (lockdownbrowser_browser_chromeos_detected()) {
+                // Trac #6588
+                // omit download links
             } else {
                 if (empty($download_url)) {
                     $ldb_links .= get_string('ldb_download_disabled', 'block_lockdownbrowser');
@@ -539,6 +557,16 @@ function lockdownbrowser_prevent_access_fragment_for_quiz($quiz, $fragment_type,
             if (lockdownbrowser_browser_cbldbex_detected()) {
                 // Trac #5994, #6026
                 // omit download and browser check links
+            } else if (lockdownbrowser_browser_chromeos_detected()) {
+                // Trac #6588
+                // omit browser check link, show error w/download link, prevent exam launch
+                $errmsg = get_string('errcbldbnotdetected', 'block_lockdownbrowser');
+                if (!empty($download_url)) {
+                    $errmsg .= "<a href=\"$download_url\" target=\"_blank\">"
+                      . $download_url . "</a>";
+                }
+                $fragment .= lockdownbrowser_format_access_error($errmsg);
+                $prevent_launch = true;
             } else {
                 if (!empty($download_url)) {
                     $ldb_links .= "<a href=\"$download_url\" target=\"_blank\">"
