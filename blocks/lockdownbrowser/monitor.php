@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2020 Respondus, Inc.  All Rights Reserved.
-// Date: December 07, 2020.
+// Copyright (c) 2011-2021 Respondus, Inc.  All Rights Reserved.
+// Date: October 27, 2021.
 
 // production flags
 // - should all default to false or 0
@@ -1377,6 +1377,7 @@ function lockdownbrowser_monitoractionversioninfo($parameters) {
     $moodle_release = $CFG->release;
     $moodle_version = $CFG->version;
 
+    $plugin = new stdClass; // Trac #6488
     $version_file = "$CFG->dirroot/blocks/lockdownbrowser/version.php";
     if (is_readable($version_file)) {
         include($version_file);

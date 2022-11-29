@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2020 Respondus, Inc.  All Rights Reserved.
-// Date: December 07, 2020.
+// Copyright (c) 2011-2021 Respondus, Inc.  All Rights Reserved.
+// Date: October 27, 2021.
 
 // Spanish (es) translations
 
@@ -147,6 +147,10 @@ $string['errsdk2015prestartfn'] = 'Nombre de función de preinicio SDK no config
 $string['errldbmonitorexitreopen'] = 'URL de salida y reapertura de LDB Monitor no configurado';
 // Trac #5994
 $string['errcbldbexcookiename'] = 'El nombre de la cookie de la Chromebook Extension para LockDown Browser no ha sio configurado.';
+// Trac #6588
+$string['errcbldbnotdetected'] = 'Este dispositivo requiere la instalación de LockDown Browser para Chromebook. Puedes instalarlo desde este enlace - ';
+// Trac #6614
+$string['errquizcopymove'] = 'Esta prueba parece haber sido copiada de otra ubicación y la configuración es incorrecta. Su instructor debe usar LockDown Browser Dashboard para corregir la configuración antes de que se pueda usar el cuestionario.';
 
 // Trac #4402
 $string['privacy:metadata'] = 'La extensión de Respondus LockDown Browser para el complemento de bloqueo de Moodle no almacena ningún dato personal.';
